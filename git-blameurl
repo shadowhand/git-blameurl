@@ -1,1 +1,63 @@
 #!/bin/bash
+
+# git-blameurl
+# @link https://gist.github.com/shadowhand/f0b9554f31daf9cf91e8
+# @author shadowhand https://github.com/shadowhand
+# @license MIT
+#
+# installation:
+# save this file as git-blameurl somewhere in your $PATH
+# make it executable: chmod +x git-blameurl
+#
+# usage:
+# git blameurl path/to/file
+# ???
+# profit
+#
+# protip (for mac):
+# open $(git blameurl path/to/file)
+#
+# enjoy!
+#
+
+usage() {
+    echo "usage: git blameurl [path]"
+    exit 0
+}
+
+# changelog
+#
+# 0.0.1
+# - initial release
+#
+version() {
+    echo "blameurl v0.0.1"
+    exit 0
+}
+
+_get_blame_url() {
+    local branch=$(git branch | grep '* ' | sed 's/* //')
+    local domain=$(git remote -v | grep '(fetch)' | awk '{print $2}' | sed -e 's/git@/https:\/\//' -e 's/com:/com\//' -e 's/.git$//')
+
+    if [ -n "$1" ]; then
+        # File was passed, provide a URL to a file
+        echo "$domain/blame/$branch/$1"
+    else
+        # Provide a URL to the branch
+        echo "$domain/tree/$branch"
+    fi
+    exit 0
+}
+
+main() {
+    while getopts "vh" o; do
+        case $o in
+            "v") version;;
+            "h") usage;;
+        esac
+    done
+
+    _get_blame_url "$1"
+}
+
+main "$@"
